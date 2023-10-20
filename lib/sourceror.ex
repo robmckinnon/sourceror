@@ -1,11 +1,11 @@
-defmodule Sourceror do
+defmodule VendoredSourceror do
   @external_resource "README.md"
   @moduledoc @external_resource
              |> File.read!()
              |> String.split("<!-- MDOC !-->")
              |> Enum.fetch!(1)
 
-  alias Sourceror.TraversalState
+  alias VendoredSourceror.TraversalState
 
   @line_fields ~w[closing do end end_of_expression]a
   # @start_fields ~w[line do]a
@@ -37,7 +37,7 @@ defmodule Sourceror do
   @code_module (if Version.match?(System.version(), "~> 1.13") do
                   Code
                 else
-                  Sourceror.Code
+                  VendoredSourceror.Code
                 end)
 
   @doc """
@@ -88,7 +88,7 @@ defmodule Sourceror do
   @spec parse_string(String.t()) :: {:ok, Macro.t()} | {:error, term()}
   def parse_string(source) do
     with {:ok, quoted, comments} <- string_to_quoted(source, to_quoted_opts()) do
-      {:ok, Sourceror.Comments.merge_comments(quoted, comments)}
+      {:ok, VendoredSourceror.Comments.merge_comments(quoted, comments)}
     end
   end
 
@@ -98,7 +98,7 @@ defmodule Sourceror do
   @spec parse_string!(String.t()) :: Macro.t()
   def parse_string!(source) do
     {quoted, comments} = string_to_quoted!(source, to_quoted_opts())
-    Sourceror.Comments.merge_comments(quoted, comments)
+    VendoredSourceror.Comments.merge_comments(quoted, comments)
   end
 
   defp to_quoted_opts do
@@ -123,7 +123,7 @@ defmodule Sourceror do
       ...> 42
       ...>
       ...> :ok
-      ...> "\"" |> Sourceror.parse_expression()
+      ...> "\"" |> VendoredSourceror.parse_expression()
       {:ok, {:__block__, [trailing_comments: [], leading_comments: [],
                           token: "42", line: 2, column: 1], [42]}, "\\n:ok"}
 
@@ -222,7 +222,7 @@ defmodule Sourceror do
   def to_algebra(quoted, opts \\ []) do
     extract_comments_opts = [collapse_comments: true, correct_lines: true] ++ opts
 
-    {quoted, comments} = Sourceror.Comments.extract_comments(quoted, extract_comments_opts)
+    {quoted, comments} = VendoredSourceror.Comments.extract_comments(quoted, extract_comments_opts)
 
     to_algebra_opts =
       opts
@@ -355,7 +355,7 @@ defmodule Sourceror do
   @doc """
   Returns the metadata of the given node.
 
-      iex> Sourceror.get_meta({:foo, [line: 5], []})
+      iex> VendoredSourceror.get_meta({:foo, [line: 5], []})
       [line: 5]
   """
   @spec get_meta(Macro.t()) :: Macro.metadata()
@@ -366,7 +366,7 @@ defmodule Sourceror do
   @doc """
   Returns the arguments of the node.
 
-      iex> Sourceror.get_args({:foo, [], [{:__block__, [], [:ok]}]})
+      iex> VendoredSourceror.get_args({:foo, [], [{:__block__, [], [:ok]}]})
       [{:__block__, [], [:ok]}]
   """
   @spec get_args(Macro.t()) :: [Macro.t()]
@@ -378,8 +378,8 @@ defmodule Sourceror do
   Updates the arguments for the given node.
 
       iex> node = {:foo, [line: 1], [{:__block__, [line: 1], [2]}]}
-      iex> updater = fn args -> Enum.map(args, &Sourceror.correct_lines(&1, 2)) end
-      iex> Sourceror.update_args(node, updater)
+      iex> updater = fn args -> Enum.map(args, &VendoredSourceror.correct_lines(&1, 2)) end
+      iex> VendoredSourceror.update_args(node, updater)
       {:foo, [line: 1], [{:__block__, [line: 3], [2]}]}
   """
   @spec update_args(Macro.t(), ([Macro.t()] -> [Macro.t()])) :: Macro.t()
@@ -394,10 +394,10 @@ defmodule Sourceror do
   A default of `nil` may also be provided if the line number is meant to be
   coalesced with a value that is not known upfront.
 
-      iex> Sourceror.get_line({:foo, [line: 5], []})
+      iex> VendoredSourceror.get_line({:foo, [line: 5], []})
       5
 
-      iex> Sourceror.get_line({:foo, [], []}, 3)
+      iex> VendoredSourceror.get_line({:foo, [], []}, 3)
       3
   """
   @spec get_line(Macro.t(), default :: integer | nil) :: integer | nil
@@ -413,10 +413,10 @@ defmodule Sourceror do
   A default of `nil` may also be provided if the column number is meant to be
   coalesced with a value that is not known upfront.
 
-      iex> Sourceror.get_column({:foo, [column: 5], []})
+      iex> VendoredSourceror.get_column({:foo, [column: 5], []})
       5
 
-      iex> Sourceror.get_column({:foo, [], []}, 3)
+      iex> VendoredSourceror.get_column({:foo, [], []}, 3)
       3
   """
   @spec get_column(Macro.t(), default :: integer | nil) :: integer | nil
@@ -430,23 +430,23 @@ defmodule Sourceror do
   `closing` and `end_of_expression` line numbers. If none is found, the default
   value is returned(defaults to 1).
 
-      iex> Sourceror.get_end_line({:foo, [end: [line: 4]], []})
+      iex> VendoredSourceror.get_end_line({:foo, [end: [line: 4]], []})
       4
 
-      iex> Sourceror.get_end_line({:foo, [closing: [line: 2]], []})
+      iex> VendoredSourceror.get_end_line({:foo, [closing: [line: 2]], []})
       2
 
-      iex> Sourceror.get_end_line({:foo, [end_of_expression: [line: 5]], []})
+      iex> VendoredSourceror.get_end_line({:foo, [end_of_expression: [line: 5]], []})
       5
 
-      iex> Sourceror.get_end_line({:foo, [closing: [line: 2], end: [line: 4]], []})
+      iex> VendoredSourceror.get_end_line({:foo, [closing: [line: 2], end: [line: 4]], []})
       4
 
       iex> "\""
       ...> alias Foo.{
       ...>   Bar
       ...> }
-      ...> "\"" |> Sourceror.parse_string!() |> Sourceror.get_end_line()
+      ...> "\"" |> VendoredSourceror.parse_string!() |> VendoredSourceror.get_end_line()
       3
   """
   @spec get_end_line(Macro.t(), integer) :: integer
@@ -457,24 +457,24 @@ defmodule Sourceror do
   @doc """
   Returns the start position of a node.
 
-      iex> quoted = Sourceror.parse_string!(" :foo")
-      iex> Sourceror.get_start_position(quoted)
+      iex> quoted = VendoredSourceror.parse_string!(" :foo")
+      iex> VendoredSourceror.get_start_position(quoted)
       [line: 1, column: 2]
 
-      iex> quoted = Sourceror.parse_string!("\\n\\nfoo()")
-      iex> Sourceror.get_start_position(quoted)
+      iex> quoted = VendoredSourceror.parse_string!("\\n\\nfoo()")
+      iex> VendoredSourceror.get_start_position(quoted)
       [line: 3, column: 1]
 
-      iex> quoted = Sourceror.parse_string!("Foo.{Bar}")
-      iex> Sourceror.get_start_position(quoted)
+      iex> quoted = VendoredSourceror.parse_string!("Foo.{Bar}")
+      iex> VendoredSourceror.get_start_position(quoted)
       [line: 1, column: 1]
 
-      iex> quoted = Sourceror.parse_string!("foo[:bar]")
-      iex> Sourceror.get_start_position(quoted)
+      iex> quoted = VendoredSourceror.parse_string!("foo[:bar]")
+      iex> VendoredSourceror.get_start_position(quoted)
       [line: 1, column: 1]
 
-      iex> quoted = Sourceror.parse_string!("foo(:bar)")
-      iex> Sourceror.get_start_position(quoted)
+      iex> quoted = VendoredSourceror.parse_string!("foo(:bar)")
+      iex> VendoredSourceror.get_start_position(quoted)
       [line: 1, column: 1]
   """
   @spec get_start_position(Macro.t(), position) :: position
@@ -511,16 +511,16 @@ defmodule Sourceror do
       ...> A.{
       ...>   B
       ...> }
-      ...> "\"" |>  Sourceror.parse_string!()
-      iex> Sourceror.get_end_position(quoted)
+      ...> "\"" |>  VendoredSourceror.parse_string!()
+      iex> VendoredSourceror.get_end_position(quoted)
       [line: 3, column: 1]
 
       iex> quoted = ~S"\""
       ...> foo do
       ...>   :ok
       ...> end
-      ...> "\"" |>  Sourceror.parse_string!()
-      iex> Sourceror.get_end_position(quoted)
+      ...> "\"" |>  VendoredSourceror.parse_string!()
+      iex> VendoredSourceror.get_end_position(quoted)
       [line: 3, column: 1]
 
       iex> quoted = ~S"\""
@@ -528,8 +528,8 @@ defmodule Sourceror do
       ...>   :a,
       ...>   :b
       ...>    )
-      ...> "\"" |>  Sourceror.parse_string!()
-      iex> Sourceror.get_end_position(quoted)
+      ...> "\"" |>  VendoredSourceror.parse_string!()
+      iex> VendoredSourceror.get_end_position(quoted)
       [line: 4, column: 4]
   """
   @spec get_end_position(Macro.t(), position) :: position
@@ -641,16 +641,16 @@ defmodule Sourceror do
       ...> def foo do
       ...>   :ok
       ...> end
-      ...> "\"" |> Sourceror.parse_string!()
-      iex> Sourceror.get_range(quoted)
+      ...> "\"" |> VendoredSourceror.parse_string!()
+      iex> VendoredSourceror.get_range(quoted)
       %{start: [line: 1, column: 1], end: [line: 3, column: 4]}
 
       iex> quoted = ~S"\""
       ...> Foo.{
       ...>   Bar
       ...> }
-      ...> "\"" |> Sourceror.parse_string!()
-      iex> Sourceror.get_range(quoted)
+      ...> "\"" |> VendoredSourceror.parse_string!()
+      iex> VendoredSourceror.get_range(quoted)
       %{start: [line: 1, column: 1], end: [line: 3, column: 2]}
 
   ## Options
@@ -661,13 +661,13 @@ defmodule Sourceror do
         ...> # Foo
         ...> :baz # Bar
         ...> "\""
-        ...> |> Sourceror.parse_string!()
-        ...> |> Sourceror.get_range(include_comments: true)
+        ...> |> VendoredSourceror.parse_string!()
+        ...> |> VendoredSourceror.get_range(include_comments: true)
         %{start: [line: 1, column: 1], end: [line: 2, column: 11]}
   """
   @spec get_range(Macro.t()) :: range | nil
   def get_range(quoted, opts \\ []) do
-    Sourceror.Range.get_range(quoted, opts)
+    VendoredSourceror.Range.get_range(quoted, opts)
   end
 
   @doc """
@@ -766,7 +766,7 @@ defmodule Sourceror do
       ...>   change: "unless allowed? do\\n  raise \\"Not allowed!\\"\\nend",
       ...>   range: %{start: [line: 1, column: 1], end: [line: 3, column: 4]}
       ...> }
-      iex> Sourceror.patch_string(original, [patch])
+      iex> VendoredSourceror.patch_string(original, [patch])
       ~S"\""
       unless allowed? do
         raise "Not allowed!"
@@ -783,7 +783,7 @@ defmodule Sourceror do
       ...>   change: &String.upcase/1,
       ...>   range: %{start: [line: 1, column: 7], end: [line: 1, column: 13]}
       ...> }
-      iex> Sourceror.patch_string(original, [patch])
+      iex> VendoredSourceror.patch_string(original, [patch])
       ~S"\""
       hello :WORLD
       "\""
@@ -802,7 +802,7 @@ defmodule Sourceror do
       ...>   change: "bar do\\n  :replacement\\nend",
       ...>   range: %{start: [line: 2, column: 9], end: [line: 4, column: 6]}
       ...> }
-      iex> Sourceror.patch_string(original, [patch])
+      iex> VendoredSourceror.patch_string(original, [patch])
       ~S"\""
       outer do
         inner(bar do
@@ -826,7 +826,7 @@ defmodule Sourceror do
       ...>   range: %{start: [line: 2, column: 9], end: [line: 4, column: 6]},
       ...>   preserve_indentation: false
       ...> }
-      iex> Sourceror.patch_string(original, [patch])
+      iex> VendoredSourceror.patch_string(original, [patch])
       ~S"\""
       outer do
         inner(bar do

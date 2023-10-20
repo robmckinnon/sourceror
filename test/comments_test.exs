@@ -1,11 +1,11 @@
-defmodule SourcerorTest.CommentsTest do
+defmodule VendoredSourcerorTest.CommentsTest do
   use ExUnit.Case, async: true
-  doctest Sourceror.Comments
+  doctest VendoredSourceror.Comments
 
   describe "merge_comments/2" do
     test "merges leading comments" do
       quoted =
-        Sourceror.parse_string!("""
+        VendoredSourceror.parse_string!("""
         # A
         :a # B
         """)
@@ -20,7 +20,7 @@ defmodule SourcerorTest.CommentsTest do
 
     test "merges trailing comments" do
       quoted =
-        Sourceror.parse_string!("""
+        VendoredSourceror.parse_string!("""
         def a do
           :ok
           # A
@@ -47,12 +47,12 @@ defmodule SourcerorTest.CommentsTest do
   describe "extract_comments/1" do
     test "preserves comment line numbers" do
       quoted =
-        Sourceror.parse_string!("""
+        VendoredSourceror.parse_string!("""
         # A
         :ok # B
         """)
 
-      {_quoted, comments} = Sourceror.Comments.extract_comments(quoted)
+      {_quoted, comments} = VendoredSourceror.Comments.extract_comments(quoted)
 
       assert [
                %{line: 1, text: "# A"},
@@ -60,14 +60,14 @@ defmodule SourcerorTest.CommentsTest do
              ] = comments
 
       quoted =
-        Sourceror.parse_string!("""
+        VendoredSourceror.parse_string!("""
         def a do
           :ok
           # A
         end # B
         """)
 
-      {_quoted, comments} = Sourceror.Comments.extract_comments(quoted)
+      {_quoted, comments} = VendoredSourceror.Comments.extract_comments(quoted)
 
       assert [
                %{line: 3, text: "# A"},
@@ -75,14 +75,14 @@ defmodule SourcerorTest.CommentsTest do
              ] = comments
 
       quoted =
-        Sourceror.parse_string!("""
+        VendoredSourceror.parse_string!("""
         Foo.{
           A
           # A
         } # B
         """)
 
-      {_quoted, comments} = Sourceror.Comments.extract_comments(quoted)
+      {_quoted, comments} = VendoredSourceror.Comments.extract_comments(quoted)
 
       assert [
                %{line: 3, text: "# A"},
@@ -92,7 +92,7 @@ defmodule SourcerorTest.CommentsTest do
 
     test "extracts comments in the correct order" do
       quoted =
-        Sourceror.parse_string!("""
+        VendoredSourceror.parse_string!("""
         # A
         def a do # B
           # C
@@ -102,7 +102,7 @@ defmodule SourcerorTest.CommentsTest do
         # G
         """)
 
-      {_quoted, comments} = Sourceror.Comments.extract_comments(quoted)
+      {_quoted, comments} = VendoredSourceror.Comments.extract_comments(quoted)
 
       assert [
                %{line: 1, text: "# A"},
@@ -117,12 +117,12 @@ defmodule SourcerorTest.CommentsTest do
 
     test "collapses comments" do
       quoted =
-        Sourceror.parse_string!("""
+        VendoredSourceror.parse_string!("""
         # A
         :ok # B
         """)
 
-      {_quoted, comments} = Sourceror.Comments.extract_comments(quoted, collapse_comments: true)
+      {_quoted, comments} = VendoredSourceror.Comments.extract_comments(quoted, collapse_comments: true)
 
       assert [
                %{line: 1, text: "# A"},
@@ -130,7 +130,7 @@ defmodule SourcerorTest.CommentsTest do
              ] = comments
 
       quoted =
-        Sourceror.parse_string!("""
+        VendoredSourceror.parse_string!("""
         def a do
           :ok
           # A
@@ -138,7 +138,7 @@ defmodule SourcerorTest.CommentsTest do
         """)
 
       {_quoted, comments} =
-        Sourceror.Comments.extract_comments(quoted, collapse_comments: true, correct_lines: true)
+        VendoredSourceror.Comments.extract_comments(quoted, collapse_comments: true, correct_lines: true)
 
       assert [
                %{line: 5, text: "# A"},
@@ -146,7 +146,7 @@ defmodule SourcerorTest.CommentsTest do
              ] = comments
 
       quoted =
-        Sourceror.parse_string!("""
+        VendoredSourceror.parse_string!("""
         Foo.{
           A
           # A
@@ -154,14 +154,14 @@ defmodule SourcerorTest.CommentsTest do
         """)
 
       {_quoted, comments} =
-        Sourceror.Comments.extract_comments(quoted, collapse_comments: true, correct_lines: true)
+        VendoredSourceror.Comments.extract_comments(quoted, collapse_comments: true, correct_lines: true)
 
       assert [
                %{line: 5, text: "# A"},
                %{line: 7, text: "# B"}
              ] = comments
 
-      assert Sourceror.to_string(quoted, collapse_comments: true, correct_lines: true) ==
+      assert VendoredSourceror.to_string(quoted, collapse_comments: true, correct_lines: true) ==
                """
                Foo.{
                  A

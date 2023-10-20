@@ -1,6 +1,6 @@
 Code.require_file("../test_helper.exs", __DIR__)
 
-defmodule SourcerorTest.Code.Normalizer.FormatterASTTest do
+defmodule VendoredSourcerorTest.Code.Normalizer.FormatterASTTest do
   use ExUnit.Case, async: true
 
   defmacro assert_same(good, opts \\ []) do
@@ -21,12 +21,12 @@ defmodule SourcerorTest.Code.Normalizer.FormatterASTTest do
         unescape: false
       ] ++ opts
 
-    {quoted, comments} = Sourceror.Code.string_to_quoted_with_comments!(good, to_quoted_opts)
+    {quoted, comments} = VendoredSourceror.Code.string_to_quoted_with_comments!(good, to_quoted_opts)
 
     to_algebra_opts = [comments: comments, escape: false] ++ opts
 
     quoted
-    |> Sourceror.Code.quoted_to_algebra(to_algebra_opts)
+    |> VendoredSourceror.Code.quoted_to_algebra(to_algebra_opts)
     |> Inspect.Algebra.format(line_length)
     |> IO.iodata_to_binary()
   end

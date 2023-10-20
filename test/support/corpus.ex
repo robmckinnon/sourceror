@@ -1,4 +1,4 @@
-defmodule SourcerorTest.Support.Corpus do
+defmodule VendoredSourcerorTest.Support.Corpus do
   @moduledoc false
 
   @version_requirements [
@@ -53,13 +53,13 @@ defmodule SourcerorTest.Support.Corpus do
     |> Enum.each(fn path ->
       path
       |> File.read!()
-      |> Sourceror.parse_string!()
+      |> VendoredSourceror.parse_string!()
       |> walk(fun, path)
     end)
   end
 
   defp walk(quoted, fun, path) do
-    Sourceror.prewalk(quoted, fn quoted, acc ->
+    VendoredSourceror.prewalk(quoted, fn quoted, acc ->
       fun.(quoted, path)
       {quoted, acc}
     end)

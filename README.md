@@ -69,7 +69,7 @@ Two metadata fields are added to the regular Elixir AST:
     quoted = """
     # Comment for :a
     :a # Also a comment for :a
-    """ |> Sourceror.parse_string!()
+    """ |> VendoredSourceror.parse_string!()
 
     assert {:__block__, meta, [:a]} = quoted
     assert meta[:leading_comments] == [
@@ -89,7 +89,7 @@ Two metadata fields are added to the regular Elixir AST:
     :ok
     # A trailing comment
     end # Not a trailing comment for :foo
-    """ |> Sourceror.parse_string!()
+    """ |> VendoredSourceror.parse_string!()
 
     assert {:__block__, block_meta, [{:def, meta, _}]} = quoted
     assert [%{line: 3, text: "# A trailing comment"}] = meta[:trailing_comments]
@@ -135,7 +135,7 @@ test "updates the source code" do
 
   new_source =
     source
-    |> Sourceror.parse_string!()
+    |> VendoredSourceror.parse_string!()
     |> Macro.postwalk(fn
       {{:., dot_meta, [{:__aliases__, alias_meta, [:String]}, :to_atom]}, call_meta, args} ->
         {{:., dot_meta, [{:__aliases__, alias_meta, [:String]}, :to_existing_atom]}, call_meta, args}
@@ -143,7 +143,7 @@ test "updates the source code" do
       quoted ->
         quoted
     end)
-    |> Sourceror.to_string()
+    |> VendoredSourceror.to_string()
 
   assert new_source ==
     """
@@ -182,13 +182,13 @@ test "patches the source code" do
 
   {_quoted, patches} =
     source
-    |> Sourceror.parse_string!()
+    |> VendoredSourceror.parse_string!()
     |> Macro.postwalk([], fn
       {{:., dot_meta, [{:__aliases__, alias_meta, [:String]}, :to_atom]}, call_meta, args} = quoted, patches ->
-        range = Sourceror.get_range(quoted)
+        range = VendoredSourceror.get_range(quoted)
         replacement =
           {{:., dot_meta, [{:__aliases__, alias_meta, [:String]}, :to_existing_atom]}, call_meta, args}
-          |> Sourceror.to_string()
+          |> VendoredSourceror.to_string()
 
         patch = %{range: range, change: replacement}
         {quoted, [patch | patches]}
@@ -197,7 +197,7 @@ test "patches the source code" do
         {quoted, patches}
     end)
 
-  assert Sourceror.patch_string(source, patches) ==
+  assert VendoredSourceror.patch_string(source, patches) ==
     """
     case foo do
       nil ->         :bar

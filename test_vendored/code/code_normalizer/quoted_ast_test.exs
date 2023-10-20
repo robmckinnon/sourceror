@@ -1,6 +1,6 @@
 Code.require_file("../test_helper.exs", __DIR__)
 
-defmodule SourcerorTest.Code.Normalizer.QuotedASTTest do
+defmodule VendoredSourcerorTest.Code.Normalizer.QuotedASTTest do
   use ExUnit.Case, async: true
 
   describe "quoted_to_algebra/2" do
@@ -671,7 +671,7 @@ defmodule SourcerorTest.Code.Normalizer.QuotedASTTest do
   end
 
   defp quoted_to_string(quoted, opts \\ []) do
-    doc = Sourceror.Code.quoted_to_algebra(quoted, opts)
+    doc = VendoredSourceror.Code.quoted_to_algebra(quoted, opts)
 
     Inspect.Algebra.format(doc, 98)
     |> IO.iodata_to_binary()

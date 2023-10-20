@@ -1,4 +1,4 @@
-defmodule Sourceror.MixProject do
+defmodule VendoredSourceror.MixProject do
   use Mix.Project
 
   @repo_url "https://github.com/doorgan/sourceror"

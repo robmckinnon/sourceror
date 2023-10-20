@@ -1,8 +1,8 @@
-defmodule Sourceror.TraversalState do
+defmodule VendoredSourceror.TraversalState do
   @moduledoc """
-  The state struct for Sourceror traversal functions.
+  The state struct for VendoredSourceror traversal functions.
   """
-  import Sourceror.Utils.TypedStruct
+  import VendoredSourceror.Utils.TypedStruct
 
   typedstruct do
     field :acc, term()

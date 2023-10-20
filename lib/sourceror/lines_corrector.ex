@@ -1,9 +1,9 @@
-defmodule Sourceror.LinesCorrector do
+defmodule VendoredSourceror.LinesCorrector do
   @moduledoc false
 
-  import Sourceror, only: [get_line: 1, correct_lines: 2]
+  import VendoredSourceror, only: [get_line: 1, correct_lines: 2]
 
-  import Sourceror.Identifier, only: [is_binary_op: 1]
+  import VendoredSourceror.Identifier, only: [is_binary_op: 1]
 
   @doc """
   Corrects the line numbers of AST nodes such that they are correctly ordered.
@@ -71,11 +71,11 @@ defmodule Sourceror.LinesCorrector do
         end
       end
 
-    last_line = Sourceror.get_end_line(quoted, state.last_line)
+    last_line = VendoredSourceror.get_end_line(quoted, state.last_line)
 
     last_line =
       if has_trailing_comments?(quoted) do
-        if Sourceror.Identifier.do_block?(quoted) do
+        if VendoredSourceror.Identifier.do_block?(quoted) do
           last_line + length(meta[:trailing_comments] || []) + 2
         else
           last_line + length(meta[:trailing_comments] || []) + 1

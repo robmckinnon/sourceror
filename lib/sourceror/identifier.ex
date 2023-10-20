@@ -1,4 +1,4 @@
-defmodule Sourceror.Identifier do
+defmodule VendoredSourceror.Identifier do
   @moduledoc """
   Functions to identify an classify forms and quoted expressions.
   """
@@ -119,28 +119,28 @@ defmodule Sourceror.Identifier do
 
   ## Examples
 
-      iex> "node()" |> Sourceror.parse_string!() |> is_call()
+      iex> "node()" |> VendoredSourceror.parse_string!() |> is_call()
       true
 
-      iex> "Kernel.node()" |> Sourceror.parse_string!() |> is_call()
+      iex> "Kernel.node()" |> VendoredSourceror.parse_string!() |> is_call()
       true
 
-      iex> "%{}" |> Sourceror.parse_string!() |> is_call()
+      iex> "%{}" |> VendoredSourceror.parse_string!() |> is_call()
       true
 
-      iex> "@attr" |> Sourceror.parse_string!() |> is_call()
+      iex> "@attr" |> VendoredSourceror.parse_string!() |> is_call()
       true
 
-      iex> "node" |> Sourceror.parse_string!() |> is_call()
+      iex> "node" |> VendoredSourceror.parse_string!() |> is_call()
       false
 
-      iex> "1" |> Sourceror.parse_string!() |> is_call()
+      iex> "1" |> VendoredSourceror.parse_string!() |> is_call()
       false
 
-      iex> "(1; 2)" |> Sourceror.parse_string!() |> is_call()
+      iex> "(1; 2)" |> VendoredSourceror.parse_string!() |> is_call()
       false
 
-      iex> "Macro.Env" |> Sourceror.parse_string!() |> is_call()
+      iex> "Macro.Env" |> VendoredSourceror.parse_string!() |> is_call()
       false
   """
   @spec is_call(Macro.t()) :: Macro.t()
@@ -158,25 +158,25 @@ defmodule Sourceror.Identifier do
 
   ## Examples
 
-      iex> "node()" |> Sourceror.parse_string!() |> is_unqualified_call()
+      iex> "node()" |> VendoredSourceror.parse_string!() |> is_unqualified_call()
       true
 
-      iex> "%{}" |> Sourceror.parse_string!() |> is_unqualified_call()
+      iex> "%{}" |> VendoredSourceror.parse_string!() |> is_unqualified_call()
       true
 
-      iex> "@attr" |> Sourceror.parse_string!() |> is_unqualified_call()
+      iex> "@attr" |> VendoredSourceror.parse_string!() |> is_unqualified_call()
       true
 
-      iex> "node" |> Sourceror.parse_string!() |> is_unqualified_call()
+      iex> "node" |> VendoredSourceror.parse_string!() |> is_unqualified_call()
       false
 
-      iex> "1" |> Sourceror.parse_string!() |> is_unqualified_call()
+      iex> "1" |> VendoredSourceror.parse_string!() |> is_unqualified_call()
       false
 
-      iex> "(1; 2)" |> Sourceror.parse_string!() |> is_unqualified_call()
+      iex> "(1; 2)" |> VendoredSourceror.parse_string!() |> is_unqualified_call()
       false
 
-      iex> "Macro.Env" |> Sourceror.parse_string!() |> is_unqualified_call()
+      iex> "Macro.Env" |> VendoredSourceror.parse_string!() |> is_unqualified_call()
       false
   """
   @spec is_unqualified_call(Macro.t()) :: Macro.t()
@@ -191,34 +191,34 @@ defmodule Sourceror.Identifier do
 
   ## Examples
 
-      iex> "Kernel.node()" |> Sourceror.parse_string!() |> is_qualified_call()
+      iex> "Kernel.node()" |> VendoredSourceror.parse_string!() |> is_qualified_call()
       true
 
-      iex> "__MODULE__.node()" |> Sourceror.parse_string!() |> is_qualified_call()
+      iex> "__MODULE__.node()" |> VendoredSourceror.parse_string!() |> is_qualified_call()
       true
 
-      iex> "foo.()" |> Sourceror.parse_string!() |> is_qualified_call()
+      iex> "foo.()" |> VendoredSourceror.parse_string!() |> is_qualified_call()
       true
 
-      iex> "foo.bar()" |> Sourceror.parse_string!() |> is_qualified_call()
+      iex> "foo.bar()" |> VendoredSourceror.parse_string!() |> is_qualified_call()
       true
 
-      iex> "node()" |> Sourceror.parse_string!() |> is_qualified_call()
+      iex> "node()" |> VendoredSourceror.parse_string!() |> is_qualified_call()
       false
 
-      iex> "%{}" |> Sourceror.parse_string!() |> is_qualified_call()
+      iex> "%{}" |> VendoredSourceror.parse_string!() |> is_qualified_call()
       false
 
-      iex> "@attr" |> Sourceror.parse_string!() |> is_qualified_call()
+      iex> "@attr" |> VendoredSourceror.parse_string!() |> is_qualified_call()
       false
 
-      iex> "1" |> Sourceror.parse_string!() |> is_qualified_call()
+      iex> "1" |> VendoredSourceror.parse_string!() |> is_qualified_call()
       false
 
-      iex> "(1; 2)" |> Sourceror.parse_string!() |> is_qualified_call()
+      iex> "(1; 2)" |> VendoredSourceror.parse_string!() |> is_qualified_call()
       false
 
-      iex> "Macro.Env" |> Sourceror.parse_string!() |> is_qualified_call()
+      iex> "Macro.Env" |> VendoredSourceror.parse_string!() |> is_qualified_call()
       false
   """
   @spec is_qualified_call(Macro.t()) :: Macro.t()
@@ -232,13 +232,13 @@ defmodule Sourceror.Identifier do
 
   ## Examples
 
-      iex> "node" |> Sourceror.parse_string!() |> is_identifier()
+      iex> "node" |> VendoredSourceror.parse_string!() |> is_identifier()
       true
 
-      iex> "node()" |> Sourceror.parse_string!() |> is_identifier()
+      iex> "node()" |> VendoredSourceror.parse_string!() |> is_identifier()
       false
 
-      iex> "1" |> Sourceror.parse_string!() |> is_identifier()
+      iex> "1" |> VendoredSourceror.parse_string!() |> is_identifier()
       false
   """
   @spec is_identifier(Macro.t()) :: Macro.t()

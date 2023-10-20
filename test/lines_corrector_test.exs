@@ -1,9 +1,9 @@
-defmodule SourcerorTest.LinesCorrectorTest do
+defmodule VendoredSourcerorTest.LinesCorrectorTest do
   use ExUnit.Case, async: true
-  doctest Sourceror.LinesCorrector
+  doctest VendoredSourceror.LinesCorrector
 
-  import Sourceror, only: [parse_string!: 1]
-  import Sourceror.LinesCorrector, only: [correct: 1]
+  import VendoredSourceror, only: [parse_string!: 1]
+  import VendoredSourceror.LinesCorrector, only: [correct: 1]
 
   describe "correct/1" do
     test "keeps previous line number if missing" do
@@ -14,7 +14,7 @@ defmodule SourcerorTest.LinesCorrectorTest do
       assert foo[:line] == 1
       assert bar[:line] == 1
 
-      assert Sourceror.to_string(corrected) ==
+      assert VendoredSourceror.to_string(corrected) ==
                ~S"""
                foo
                bar
@@ -25,7 +25,7 @@ defmodule SourcerorTest.LinesCorrectorTest do
     test "increments line number if it's too low" do
       assert {:__block__, block_meta, [foo, bar]} = parse_string!("foo; bar")
 
-      bar = Sourceror.correct_lines(bar, -2)
+      bar = VendoredSourceror.correct_lines(bar, -2)
 
       corrected = correct({:__block__, block_meta, [foo, bar]})
 
@@ -36,7 +36,7 @@ defmodule SourcerorTest.LinesCorrectorTest do
       # set to the same as the previous one
       assert bar_meta[:line] == 1
 
-      assert Sourceror.to_string(corrected) ==
+      assert VendoredSourceror.to_string(corrected) ==
                ~S"""
                foo
                bar
@@ -48,7 +48,7 @@ defmodule SourcerorTest.LinesCorrectorTest do
       assert {:foo, foo_meta, [[{do_kw, bar}]]} = parse_string!("foo do bar end")
 
       bar =
-        Sourceror.append_comments(bar, [
+        VendoredSourceror.append_comments(bar, [
           %{line: 1, previous_eol_count: 1, next_eol_count: 1, text: "# bar comment"}
         ])
 
@@ -60,7 +60,7 @@ defmodule SourcerorTest.LinesCorrectorTest do
       assert bar_meta[:line] == 3
       assert foo_meta[:end][:line] == 3
 
-      assert Sourceror.to_string(corrected) ==
+      assert VendoredSourceror.to_string(corrected) ==
                ~S"""
                foo do
                  # bar comment

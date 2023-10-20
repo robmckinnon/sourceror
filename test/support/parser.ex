@@ -1,4 +1,4 @@
-defmodule SourcerorTest.Support.Parser do
+defmodule VendoredSourcerorTest.Support.Parser do
   @moduledoc false
 
   defstruct in_docstring?: false,

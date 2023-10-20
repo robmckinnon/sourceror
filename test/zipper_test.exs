@@ -1,8 +1,8 @@
-defmodule SourcerorTest.ZipperTest do
+defmodule VendoredSourcerorTest.ZipperTest do
   use ExUnit.Case, async: true
-  doctest Sourceror.Zipper, except: [:moduledoc]
+  doctest VendoredSourceror.Zipper, except: [:moduledoc]
 
-  alias Sourceror.Zipper, as: Z
+  alias VendoredSourceror.Zipper, as: Z
 
   describe "zip/1" do
     test "creates a zipper from a term" do

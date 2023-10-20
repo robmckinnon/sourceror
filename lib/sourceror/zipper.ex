@@ -1,4 +1,4 @@
-defmodule Sourceror.Zipper do
+defmodule VendoredSourceror.Zipper do
   @moduledoc """
   Tree-like data structure that provides enhanced navigation and modification
   of an Elixir AST.
@@ -23,7 +23,7 @@ defmodule Sourceror.Zipper do
 
   import Kernel, except: [node: 1]
 
-  alias Sourceror.Zipper, as: Z
+  alias VendoredSourceror.Zipper, as: Z
 
   defstruct [:node, :path]
 

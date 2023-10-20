@@ -1,8 +1,8 @@
-defmodule SourcerorTest.Utils.TypedstructTest do
+defmodule VendoredSourcerorTest.Utils.TypedstructTest do
   use ExUnit.Case, async: true
-  doctest Sourceror.Utils.TypedStruct
+  doctest VendoredSourceror.Utils.TypedStruct
 
-  import Sourceror.Utils.TypedStruct
+  import VendoredSourceror.Utils.TypedStruct
 
   describe "typedstruct/1" do
     test "generates the correct code" do

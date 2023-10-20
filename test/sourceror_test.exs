@@ -1,11 +1,11 @@
-defmodule SourcerorTest do
+defmodule VendoredSourcerorTest do
   use ExUnit.Case, async: true
-  doctest Sourceror
+  doctest VendoredSourceror
 
   defmacro assert_same(string, opts \\ []) do
     quote bind_quoted: [string: string, opts: opts] do
       string = String.trim(string)
-      assert string == Sourceror.parse_string!(string) |> Sourceror.to_string(opts)
+      assert string == VendoredSourceror.parse_string!(string) |> VendoredSourceror.to_string(opts)
     end
   end
 
@@ -185,11 +185,11 @@ defmodule SourcerorTest do
   describe "parse_string!/2" do
     test "raises on invalid string" do
       assert_raise SyntaxError, fn ->
-        Sourceror.parse_string!(":ok end")
+        VendoredSourceror.parse_string!(":ok end")
       end
 
       assert_raise TokenMissingError, fn ->
-        Sourceror.parse_string!("do :ok")
+        VendoredSourceror.parse_string!("do :ok")
       end
     end
   end
@@ -197,7 +197,7 @@ defmodule SourcerorTest do
   describe "parse_expression/2" do
     test "parses only the first valid expression" do
       parsed =
-        Sourceror.parse_expression(~S"""
+        VendoredSourceror.parse_expression(~S"""
         foo do
           :ok
         end
@@ -209,10 +209,10 @@ defmodule SourcerorTest do
     end
 
     test "does not success on empty strings" do
-      assert {:error, _} = Sourceror.parse_expression("")
+      assert {:error, _} = VendoredSourceror.parse_expression("")
 
       assert {:ok, {:__block__, _, [:ok]}, ""} =
-               Sourceror.parse_expression(~S"""
+               VendoredSourceror.parse_expression(~S"""
 
                :ok
                """)
@@ -227,12 +227,12 @@ defmodule SourcerorTest do
       :c
       """
 
-      assert {:ok, {_, _, [:a]}, _} = Sourceror.parse_expression(source, from_line: 1)
+      assert {:ok, {_, _, [:a]}, _} = VendoredSourceror.parse_expression(source, from_line: 1)
 
       assert {:ok, {:foo, _, [[{{_, _, [:do]}, {_, _, [:ok]}}]]}, _} =
-               Sourceror.parse_expression(source, from_line: 2)
+               VendoredSourceror.parse_expression(source, from_line: 2)
 
-      assert {:ok, {_, _, [:c]}, _} = Sourceror.parse_expression(source, from_line: 5)
+      assert {:ok, {_, _, [:c]}, _} = VendoredSourceror.parse_expression(source, from_line: 5)
     end
   end
 
@@ -246,7 +246,7 @@ defmodule SourcerorTest do
       """
 
       expected = Code.format_string!(source) |> IO.iodata_to_binary()
-      actual = Sourceror.parse_string!(source) |> Sourceror.to_string()
+      actual = VendoredSourceror.parse_string!(source) |> VendoredSourceror.to_string()
 
       assert expected == actual
     end
@@ -267,8 +267,8 @@ defmodule SourcerorTest do
 
       actual =
         source
-        |> Sourceror.parse_string!()
-        |> Sourceror.to_string(indent: 1)
+        |> VendoredSourceror.parse_string!()
+        |> VendoredSourceror.to_string(indent: 1)
 
       assert expected == actual
 
@@ -281,8 +281,8 @@ defmodule SourcerorTest do
 
       actual =
         source
-        |> Sourceror.parse_string!()
-        |> Sourceror.to_string(indent: 3, indent_type: :single_space)
+        |> VendoredSourceror.parse_string!()
+        |> VendoredSourceror.to_string(indent: 3, indent_type: :single_space)
 
       assert expected == actual
 
@@ -295,8 +295,8 @@ defmodule SourcerorTest do
 
       actual =
         source
-        |> Sourceror.parse_string!()
-        |> Sourceror.to_string(indent: 1, indent_type: :tabs)
+        |> VendoredSourceror.parse_string!()
+        |> VendoredSourceror.to_string(indent: 1, indent_type: :tabs)
 
       assert expected == actual
     end
@@ -325,25 +325,25 @@ defmodule SourcerorTest do
     end
 
     test "with format: :splicing" do
-      assert "a: b" == Sourceror.to_string([{:a, {:b, [], nil}}], format: :splicing)
-      assert "1, 2, 3" == Sourceror.to_string([1, 2, 3], format: :splicing)
-      assert "{:foo, :bar}" == Sourceror.to_string({:foo, :bar}, format: :splicing)
+      assert "a: b" == VendoredSourceror.to_string([{:a, {:b, [], nil}}], format: :splicing)
+      assert "1, 2, 3" == VendoredSourceror.to_string([1, 2, 3], format: :splicing)
+      assert "{:foo, :bar}" == VendoredSourceror.to_string({:foo, :bar}, format: :splicing)
     end
 
     test "last tuple element as keyword list must keep its format" do
       code = ~S({:wrapped, [opt1: true, opt2: false]})
-      assert code |> Sourceror.parse_string!() |> Sourceror.to_string() == code
+      assert code |> VendoredSourceror.parse_string!() |> VendoredSourceror.to_string() == code
 
       code = ~S({:unwrapped, opt1: true, opt2: false})
-      assert code |> Sourceror.parse_string!() |> Sourceror.to_string() == code
+      assert code |> VendoredSourceror.parse_string!() |> VendoredSourceror.to_string() == code
     end
 
     test "last tuple element as keyword list must keep its format (2-tuples)" do
       code = ~S({:wrapped, 1, [opt1: true, opt2: false]})
-      assert code |> Sourceror.parse_string!() |> Sourceror.to_string() == code
+      assert code |> VendoredSourceror.parse_string!() |> VendoredSourceror.to_string() == code
 
       code = ~S({:unwrapped, 1, opt1: true, opt2: false})
-      assert code |> Sourceror.parse_string!() |> Sourceror.to_string() == code
+      assert code |> VendoredSourceror.parse_string!() |> VendoredSourceror.to_string() == code
     end
 
     test "supports locals_without_parens" do
@@ -351,10 +351,10 @@ defmodule SourcerorTest do
 
       code = ~S"defparsec :do_parse, parser"
 
-      assert code |> Sourceror.parse_string!() |> Sourceror.to_string() ==
+      assert code |> VendoredSourceror.parse_string!() |> VendoredSourceror.to_string() ==
                ~S"defparsec(:do_parse, parser)"
 
-      assert code |> Sourceror.parse_string!() |> Sourceror.to_string(opts) == code
+      assert code |> VendoredSourceror.parse_string!() |> VendoredSourceror.to_string(opts) == code
     end
 
     test "with optional quoted_to_algebra" do
@@ -384,13 +384,13 @@ defmodule SourcerorTest do
 
   describe "correct_lines/2" do
     test "corrects all line fields" do
-      assert [line: 2] = Sourceror.correct_lines([line: 1], 1)
-      assert [closing: [line: 2]] = Sourceror.correct_lines([closing: [line: 1]], 1)
-      assert [do: [line: 2]] = Sourceror.correct_lines([do: [line: 1]], 1)
-      assert [end: [line: 2]] = Sourceror.correct_lines([end: [line: 1]], 1)
+      assert [line: 2] = VendoredSourceror.correct_lines([line: 1], 1)
+      assert [closing: [line: 2]] = VendoredSourceror.correct_lines([closing: [line: 1]], 1)
+      assert [do: [line: 2]] = VendoredSourceror.correct_lines([do: [line: 1]], 1)
+      assert [end: [line: 2]] = VendoredSourceror.correct_lines([end: [line: 1]], 1)
 
       assert [end_of_expression: [line: 2]] =
-               Sourceror.correct_lines([end_of_expression: [line: 1]], 1)
+               VendoredSourceror.correct_lines([end_of_expression: [line: 1]], 1)
 
       assert [
                line: 2,
@@ -399,7 +399,7 @@ defmodule SourcerorTest do
                end: [line: 2],
                end_of_expression: [line: 2]
              ] =
-               Sourceror.correct_lines(
+               VendoredSourceror.correct_lines(
                  [
                    line: 1,
                    closing: [line: 1],
@@ -414,20 +414,20 @@ defmodule SourcerorTest do
 
   describe "get_start_position/2" do
     test "returns the start position" do
-      quoted = Sourceror.parse_string!(" :foo")
-      assert Sourceror.get_start_position(quoted) == [line: 1, column: 2]
+      quoted = VendoredSourceror.parse_string!(" :foo")
+      assert VendoredSourceror.get_start_position(quoted) == [line: 1, column: 2]
 
-      quoted = Sourceror.parse_string!("\n\nfoo()")
-      assert Sourceror.get_start_position(quoted) == [line: 3, column: 1]
+      quoted = VendoredSourceror.parse_string!("\n\nfoo()")
+      assert VendoredSourceror.get_start_position(quoted) == [line: 3, column: 1]
 
-      quoted = Sourceror.parse_string!("Foo.{Bar}")
-      assert Sourceror.get_start_position(quoted) == [line: 1, column: 1]
+      quoted = VendoredSourceror.parse_string!("Foo.{Bar}")
+      assert VendoredSourceror.get_start_position(quoted) == [line: 1, column: 1]
 
-      quoted = Sourceror.parse_string!("foo[:bar]")
-      assert Sourceror.get_start_position(quoted) == [line: 1, column: 1]
+      quoted = VendoredSourceror.parse_string!("foo[:bar]")
+      assert VendoredSourceror.get_start_position(quoted) == [line: 1, column: 1]
 
-      quoted = Sourceror.parse_string!("foo(:bar)")
-      assert Sourceror.get_start_position(quoted) == [line: 1, column: 1]
+      quoted = VendoredSourceror.parse_string!("foo(:bar)")
+      assert VendoredSourceror.get_start_position(quoted) == [line: 1, column: 1]
     end
   end
 
@@ -439,9 +439,9 @@ defmodule SourcerorTest do
           B
         }
         """
-        |> Sourceror.parse_string!()
+        |> VendoredSourceror.parse_string!()
 
-      assert Sourceror.get_end_position(quoted) == [line: 3, column: 1]
+      assert VendoredSourceror.get_end_position(quoted) == [line: 3, column: 1]
 
       quoted =
         ~S"""
@@ -449,9 +449,9 @@ defmodule SourcerorTest do
           :ok
         end
         """
-        |> Sourceror.parse_string!()
+        |> VendoredSourceror.parse_string!()
 
-      assert Sourceror.get_end_position(quoted) == [line: 3, column: 1]
+      assert VendoredSourceror.get_end_position(quoted) == [line: 3, column: 1]
 
       quoted =
         ~S"""
@@ -460,9 +460,9 @@ defmodule SourcerorTest do
              :b
            )
         """
-        |> Sourceror.parse_string!()
+        |> VendoredSourceror.parse_string!()
 
-      assert Sourceror.get_end_position(quoted) == [line: 4, column: 4]
+      assert VendoredSourceror.get_end_position(quoted) == [line: 4, column: 4]
 
       quoted =
         ~S"""
@@ -471,30 +471,30 @@ defmodule SourcerorTest do
         foo bar()
         _
         """
-        |> Sourceror.parse_string!()
+        |> VendoredSourceror.parse_string!()
 
       {_, _, [parens, without_parens, nested, _]} = quoted
 
-      assert Sourceror.get_end_position(parens) == [line: 1, column: 6]
-      assert Sourceror.get_end_position(without_parens) == [line: 2, column: 5]
-      assert Sourceror.get_end_position(nested) == [line: 3, column: 9]
+      assert VendoredSourceror.get_end_position(parens) == [line: 1, column: 6]
+      assert VendoredSourceror.get_end_position(without_parens) == [line: 2, column: 5]
+      assert VendoredSourceror.get_end_position(nested) == [line: 3, column: 9]
     end
   end
 
   describe "compare_positions/2" do
     test "correctly compares positions" do
-      assert Sourceror.compare_positions([line: 1, column: 1], line: 1, column: 1) == :eq
-      assert Sourceror.compare_positions([line: nil, column: nil], line: nil, column: nil) == :eq
-      assert Sourceror.compare_positions([line: 2, column: 1], line: 1, column: 1) == :gt
-      assert Sourceror.compare_positions([line: 1, column: 5], line: 1, column: 1) == :gt
-      assert Sourceror.compare_positions([line: 1, column: 1], line: 2, column: 1) == :lt
-      assert Sourceror.compare_positions([line: 1, column: 1], line: 1, column: 5) == :lt
-      assert Sourceror.compare_positions([line: 1, column: 1], line: 2, column: 2) == :lt
+      assert VendoredSourceror.compare_positions([line: 1, column: 1], line: 1, column: 1) == :eq
+      assert VendoredSourceror.compare_positions([line: nil, column: nil], line: nil, column: nil) == :eq
+      assert VendoredSourceror.compare_positions([line: 2, column: 1], line: 1, column: 1) == :gt
+      assert VendoredSourceror.compare_positions([line: 1, column: 5], line: 1, column: 1) == :gt
+      assert VendoredSourceror.compare_positions([line: 1, column: 1], line: 2, column: 1) == :lt
+      assert VendoredSourceror.compare_positions([line: 1, column: 1], line: 1, column: 5) == :lt
+      assert VendoredSourceror.compare_positions([line: 1, column: 1], line: 2, column: 2) == :lt
     end
 
     test "nil is strictly less than integers" do
-      assert Sourceror.compare_positions([line: nil, column: nil], line: 1, column: 1) == :lt
-      assert Sourceror.compare_positions([line: 1, column: 1], line: nil, column: nil) == :gt
+      assert VendoredSourceror.compare_positions([line: nil, column: nil], line: 1, column: 1) == :lt
+      assert VendoredSourceror.compare_positions([line: 1, column: 1], line: nil, column: nil) == :gt
     end
   end
 
@@ -506,9 +506,9 @@ defmodule SourcerorTest do
           :ok
         end
         """
-        |> Sourceror.parse_string!()
+        |> VendoredSourceror.parse_string!()
 
-      assert Sourceror.get_range(quoted) == %{
+      assert VendoredSourceror.get_range(quoted) == %{
                start: [line: 1, column: 1],
                end: [line: 3, column: 4]
              }
@@ -519,9 +519,9 @@ defmodule SourcerorTest do
           Bar
         }
         """
-        |> Sourceror.parse_string!()
+        |> VendoredSourceror.parse_string!()
 
-      assert Sourceror.get_range(quoted) == %{
+      assert VendoredSourceror.get_range(quoted) == %{
                start: [line: 1, column: 1],
                end: [line: 3, column: 2]
              }
@@ -535,21 +535,21 @@ defmodule SourcerorTest do
         foo bar()
         _
         """
-        |> Sourceror.parse_string!()
+        |> VendoredSourceror.parse_string!()
 
       {_, _, [parens, without_parens, nested_without_parens, _]} = quoted
 
-      assert Sourceror.get_range(parens) == %{
+      assert VendoredSourceror.get_range(parens) == %{
                start: [line: 1, column: 1],
                end: [line: 1, column: 7]
              }
 
-      assert Sourceror.get_range(without_parens) == %{
+      assert VendoredSourceror.get_range(without_parens) == %{
                start: [line: 2, column: 1],
                end: [line: 2, column: 6]
              }
 
-      assert Sourceror.get_range(nested_without_parens) == %{
+      assert VendoredSourceror.get_range(nested_without_parens) == %{
                start: [line: 3, column: 1],
                end: [line: 3, column: 10]
              }
@@ -563,20 +563,20 @@ defmodule SourcerorTest do
       ]
 
       quoted =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         # A
         :ok
         """)
 
-      quoted = Sourceror.prepend_comments(quoted, comments)
-      leading_comments = Sourceror.get_meta(quoted)[:leading_comments]
+      quoted = VendoredSourceror.prepend_comments(quoted, comments)
+      leading_comments = VendoredSourceror.get_meta(quoted)[:leading_comments]
 
       assert [
                %{line: 1, previous_eol_count: 1, next_eol_count: 1, text: "# B"},
                %{line: 1, previous_eol_count: 1, next_eol_count: 1, text: "# A"}
              ] = leading_comments
 
-      assert Sourceror.to_string(quoted) ==
+      assert VendoredSourceror.to_string(quoted) ==
                ~S"""
                # B
                # A
@@ -585,18 +585,18 @@ defmodule SourcerorTest do
                |> String.trim()
 
       quoted =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         :ok
         """)
 
-      quoted = Sourceror.prepend_comments(quoted, comments)
-      leading_comments = Sourceror.get_meta(quoted)[:leading_comments]
+      quoted = VendoredSourceror.prepend_comments(quoted, comments)
+      leading_comments = VendoredSourceror.get_meta(quoted)[:leading_comments]
 
       assert leading_comments == [
                %{line: 1, previous_eol_count: 1, next_eol_count: 1, text: "# B"}
              ]
 
-      assert Sourceror.to_string(quoted) ==
+      assert VendoredSourceror.to_string(quoted) ==
                ~S"""
                # B
                :ok
@@ -604,19 +604,19 @@ defmodule SourcerorTest do
                |> String.trim()
 
       quoted =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         foo do
           :ok
           # A
         end
         """)
 
-      quoted = Sourceror.prepend_comments(quoted, comments, :trailing)
-      trailing_comments = Sourceror.get_meta(quoted)[:trailing_comments]
+      quoted = VendoredSourceror.prepend_comments(quoted, comments, :trailing)
+      trailing_comments = VendoredSourceror.get_meta(quoted)[:trailing_comments]
 
       assert [%{text: "# B"}, %{text: "# A"}] = trailing_comments
 
-      assert Sourceror.to_string(quoted) ==
+      assert VendoredSourceror.to_string(quoted) ==
                ~S"""
                foo do
                  :ok
@@ -628,18 +628,18 @@ defmodule SourcerorTest do
                |> String.trim()
 
       quoted =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         foo do
           :ok
         end
         """)
 
-      quoted = Sourceror.prepend_comments(quoted, comments, :trailing)
-      trailing_comments = Sourceror.get_meta(quoted)[:trailing_comments]
+      quoted = VendoredSourceror.prepend_comments(quoted, comments, :trailing)
+      trailing_comments = VendoredSourceror.get_meta(quoted)[:trailing_comments]
 
       assert [%{text: "# B"}] = trailing_comments
 
-      assert Sourceror.to_string(quoted) ==
+      assert VendoredSourceror.to_string(quoted) ==
                ~S"""
                foo do
                  :ok
@@ -650,15 +650,15 @@ defmodule SourcerorTest do
                |> String.trim()
 
       quoted =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         Foo.{
           Bar
         }
         """)
 
-      quoted = Sourceror.prepend_comments(quoted, comments, :trailing)
+      quoted = VendoredSourceror.prepend_comments(quoted, comments, :trailing)
 
-      assert Sourceror.to_string(quoted) ==
+      assert VendoredSourceror.to_string(quoted) ==
                ~S"""
                Foo.{
                  Bar
@@ -677,17 +677,17 @@ defmodule SourcerorTest do
       ]
 
       quoted =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         # A
         :ok
         """)
 
-      quoted = Sourceror.append_comments(quoted, comments)
-      leading_comments = Sourceror.get_meta(quoted)[:leading_comments]
+      quoted = VendoredSourceror.append_comments(quoted, comments)
+      leading_comments = VendoredSourceror.get_meta(quoted)[:leading_comments]
 
       assert [%{text: "# A"}, %{text: "# B"}] = leading_comments
 
-      assert Sourceror.to_string(quoted) ==
+      assert VendoredSourceror.to_string(quoted) ==
                ~S"""
                # A
                # B
@@ -696,16 +696,16 @@ defmodule SourcerorTest do
                |> String.trim()
 
       quoted =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         :ok
         """)
 
-      quoted = Sourceror.append_comments(quoted, comments)
-      leading_comments = Sourceror.get_meta(quoted)[:leading_comments]
+      quoted = VendoredSourceror.append_comments(quoted, comments)
+      leading_comments = VendoredSourceror.get_meta(quoted)[:leading_comments]
 
       assert [%{text: "# B"}] = leading_comments
 
-      assert Sourceror.to_string(quoted) ==
+      assert VendoredSourceror.to_string(quoted) ==
                ~S"""
                # B
                :ok
@@ -713,7 +713,7 @@ defmodule SourcerorTest do
                |> String.trim()
 
       quoted =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         foo do
           :ok
 
@@ -721,12 +721,12 @@ defmodule SourcerorTest do
         end
         """)
 
-      quoted = Sourceror.append_comments(quoted, comments, :trailing)
-      trailing_comments = Sourceror.get_meta(quoted)[:trailing_comments]
+      quoted = VendoredSourceror.append_comments(quoted, comments, :trailing)
+      trailing_comments = VendoredSourceror.get_meta(quoted)[:trailing_comments]
 
       assert [%{text: "# A"}, %{text: "# B"}] = trailing_comments
 
-      assert Sourceror.to_string(quoted) ==
+      assert VendoredSourceror.to_string(quoted) ==
                ~S"""
                foo do
                  :ok
@@ -738,18 +738,18 @@ defmodule SourcerorTest do
                |> String.trim()
 
       quoted =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         foo do
           :ok
         end
         """)
 
-      quoted = Sourceror.append_comments(quoted, comments, :trailing)
-      trailing_comments = Sourceror.get_meta(quoted)[:trailing_comments]
+      quoted = VendoredSourceror.append_comments(quoted, comments, :trailing)
+      trailing_comments = VendoredSourceror.get_meta(quoted)[:trailing_comments]
 
       assert [%{text: "# B"}] = trailing_comments
 
-      assert Sourceror.to_string(quoted) ==
+      assert VendoredSourceror.to_string(quoted) ==
                ~S"""
                foo do
                  :ok
@@ -760,15 +760,15 @@ defmodule SourcerorTest do
                |> String.trim()
 
       quoted =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         Foo.{
           Bar
         }
         """)
 
-      quoted = Sourceror.append_comments(quoted, comments, :trailing)
+      quoted = VendoredSourceror.append_comments(quoted, comments, :trailing)
 
-      assert Sourceror.to_string(quoted) ==
+      assert VendoredSourceror.to_string(quoted) ==
                ~S"""
                Foo.{
                  Bar
@@ -793,7 +793,7 @@ defmodule SourcerorTest do
         range: %{start: [line: 1, column: 7], end: [line: 1, column: 10]}
       }
 
-      assert Sourceror.patch_string(original, [patch]) == ~S"""
+      assert VendoredSourceror.patch_string(original, [patch]) == ~S"""
              hello world do
                :ok
              end
@@ -818,7 +818,7 @@ defmodule SourcerorTest do
         }
       ]
 
-      assert Sourceror.patch_string(original, patches) == ~S"a something long c"
+      assert VendoredSourceror.patch_string(original, patches) == ~S"a something long c"
     end
 
     test "patches multiple ranges in a single line with single and multiline changes" do
@@ -843,7 +843,7 @@ defmodule SourcerorTest do
         }
       ]
 
-      assert Sourceror.patch_string(original, patches) == ~S"""
+      assert VendoredSourceror.patch_string(original, patches) == ~S"""
              a something long [
                next
              ]
@@ -870,7 +870,7 @@ defmodule SourcerorTest do
         range: %{start: [line: 1, column: 1], end: [line: 3, column: 4]}
       }
 
-      assert Sourceror.patch_string(original, [patch]) == ~S"""
+      assert VendoredSourceror.patch_string(original, [patch]) == ~S"""
              unless allowed? do
                raise "Not allowed!"
              end
@@ -899,7 +899,7 @@ defmodule SourcerorTest do
         range: %{start: [line: 2, column: 13], end: [line: 4, column: 8]}
       }
 
-      assert Sourceror.patch_string(original, [patch]) == ~S"""
+      assert VendoredSourceror.patch_string(original, [patch]) == ~S"""
              foo do
                some_call(whatever do
                  :inner
@@ -926,7 +926,7 @@ defmodule SourcerorTest do
         range: %{start: [line: 2, column: 3], end: [line: 2, column: 6]}
       }
 
-      assert Sourceror.patch_string(original, [patch]) == ~S"""
+      assert VendoredSourceror.patch_string(original, [patch]) == ~S"""
              hello world do
                [
                  1,
@@ -953,7 +953,7 @@ defmodule SourcerorTest do
         range: %{start: [line: 2, column: 9], end: [line: 2, column: 12]}
       }
 
-      assert Sourceror.patch_string(original, [patch]) == ~S"""
+      assert VendoredSourceror.patch_string(original, [patch]) == ~S"""
              outer do
                inner [
                  1,
@@ -983,7 +983,7 @@ defmodule SourcerorTest do
         preserve_indentation: false
       }
 
-      assert Sourceror.patch_string(original, [patch]) == ~S"""
+      assert VendoredSourceror.patch_string(original, [patch]) == ~S"""
              hello world do
                [
                1,
@@ -1032,7 +1032,7 @@ defmodule SourcerorTest do
         }
       }
 
-      assert Sourceror.patch_string(original, [patch1, patch2]) ==
+      assert VendoredSourceror.patch_string(original, [patch1, patch2]) ==
                ~S"""
                unless allowed? do
                  raise "Not allowed!"
@@ -1068,7 +1068,7 @@ defmodule SourcerorTest do
         preserve_indentation: false
       }
 
-      assert Sourceror.patch_string(original, [patch]) == ~S"""
+      assert VendoredSourceror.patch_string(original, [patch]) == ~S"""
              foo do
                baz do
                :not_ok
@@ -1089,7 +1089,7 @@ defmodule SourcerorTest do
         range: %{start: [line: 1, column: 7], end: [line: 1, column: 12]}
       }
 
-      assert Sourceror.patch_string(original, [patch]) == ~S"""
+      assert VendoredSourceror.patch_string(original, [patch]) == ~S"""
              hello WORLD do
                :ok
              end
@@ -1111,7 +1111,7 @@ defmodule SourcerorTest do
         }
       }
 
-      assert Sourceror.patch_string(original, [patch]) == ~S"""
+      assert VendoredSourceror.patch_string(original, [patch]) == ~S"""
              foo do
                BAR DO
                  :OK

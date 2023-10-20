@@ -1,6 +1,6 @@
 # This module was vendored from the Elixir source code to backport new features.
 
-defmodule Sourceror.Code.Normalizer do
+defmodule VendoredSourceror.Code.Normalizer do
   @moduledoc false
 
   defguard is_literal(x)
@@ -22,7 +22,7 @@ defmodule Sourceror.Code.Normalizer do
       escape: escape,
       parent_meta: [line: line],
       locals_without_parens:
-        locals_without_parens ++ Sourceror.Code.Formatter.locals_without_parens()
+        locals_without_parens ++ VendoredSourceror.Code.Formatter.locals_without_parens()
     }
 
     do_normalize(quoted, state)
@@ -254,7 +254,7 @@ defmodule Sourceror.Code.Normalizer do
     meta = patch_meta_line(meta, state.parent_meta)
     literal = maybe_escape_literal(literal, state)
 
-    if is_atom(literal) and Sourceror.Code.classify_atom(literal) == :alias and
+    if is_atom(literal) and VendoredSourceror.Code.classify_atom(literal) == :alias and
          is_nil(meta[:delimiter]) do
       "Elixir." <> segments = Atom.to_string(literal)
 
@@ -332,7 +332,7 @@ defmodule Sourceror.Code.Normalizer do
 
     meta =
       if is_nil(meta[:no_parens]) and is_nil(meta[:closing]) and is_nil(meta[:do]) and
-           not Sourceror.Code.Formatter.local_without_parens?(
+           not VendoredSourceror.Code.Formatter.local_without_parens?(
              form,
              arity,
              state.locals_without_parens

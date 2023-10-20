@@ -1,9 +1,9 @@
-defmodule Sourceror.Comments do
+defmodule VendoredSourceror.Comments do
   @moduledoc """
   Utilities to merge an un-merge comments and quoted expressions.
   """
 
-  import Sourceror.Identifier, only: [is_pipeline_op: 1, is_binary_op: 1]
+  import VendoredSourceror.Identifier, only: [is_pipeline_op: 1, is_binary_op: 1]
 
   @doc """
   Merges the comments into the given quoted expression.
@@ -23,9 +23,9 @@ defmodule Sourceror.Comments do
         quoted
 
       _ ->
-        if match?({:__block__, _, [_ | _]}, quoted) and not Sourceror.Identifier.do_block?(quoted) do
-          {last, args} = Sourceror.get_args(quoted) |> List.pop_at(-1)
-          line = Sourceror.get_line(last)
+        if match?({:__block__, _, [_ | _]}, quoted) and not VendoredSourceror.Identifier.do_block?(quoted) do
+          {last, args} = VendoredSourceror.get_args(quoted) |> List.pop_at(-1)
+          line = VendoredSourceror.get_line(last)
 
           last =
             {:__block__,
@@ -36,9 +36,9 @@ defmodule Sourceror.Comments do
                line: line
              ], [last]}
 
-          {:__block__, Sourceror.get_meta(quoted), args ++ [last]}
+          {:__block__, VendoredSourceror.get_meta(quoted), args ++ [last]}
         else
-          line = Sourceror.get_line(quoted)
+          line = VendoredSourceror.get_line(quoted)
 
           {:__block__,
            [
@@ -71,7 +71,7 @@ defmodule Sourceror.Comments do
   defp merge_leftovers(quoted, comments), do: {quoted, comments}
 
   defp gather_leading_comments_for_node(quoted, comments) do
-    line = Sourceror.get_line(quoted, 0)
+    line = VendoredSourceror.get_line(quoted, 0)
 
     {comments, rest} =
       Enum.reduce(comments, {[], []}, fn
@@ -90,8 +90,8 @@ defmodule Sourceror.Comments do
   end
 
   defp gather_trailing_comments_for_node(quoted, comments) do
-    line = Sourceror.get_end_line(quoted, 0)
-    has_closing_line? = Sourceror.has_closing_line?(quoted)
+    line = VendoredSourceror.get_end_line(quoted, 0)
+    has_closing_line? = VendoredSourceror.has_closing_line?(quoted)
 
     {comments, rest} =
       Enum.reduce(comments, {[], []}, fn
@@ -129,7 +129,7 @@ defmodule Sourceror.Comments do
 
     quoted =
       if correct_lines do
-        Sourceror.LinesCorrector.correct(quoted)
+        VendoredSourceror.LinesCorrector.correct(quoted)
       else
         quoted
       end
@@ -191,7 +191,7 @@ defmodule Sourceror.Comments do
   end
 
   defp collapse_trailing_comments(quoted, trailing_comments) do
-    meta = Sourceror.get_meta(quoted)
+    meta = VendoredSourceror.get_meta(quoted)
     trailing_block? = meta[:__sourceror__][:trailing_block]
 
     comments =

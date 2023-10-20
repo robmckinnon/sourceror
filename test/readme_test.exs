@@ -1,10 +1,10 @@
-defmodule SourcerorTest.ReadmeTest do
+defmodule VendoredSourcerorTest.ReadmeTest do
   use ExUnit.Case, async: true
 
-  alias SourcerorTest.Support.Parser
+  alias VendoredSourcerorTest.Support.Parser
   require Parser
 
-  @project Sourceror.MixProject.project()
+  @project VendoredSourceror.MixProject.project()
 
   readme_path = Parser.resource("README.md")
   readme = Parser.code_blocks(readme_path)

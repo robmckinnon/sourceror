@@ -36,8 +36,8 @@ defmodule MyApp.MixProject do
   end
 end
 """
-|> Sourceror.parse_string!()
-|> Sourceror.postwalk(fn
+|> VendoredSourceror.parse_string!()
+|> VendoredSourceror.postwalk(fn
   {:defp, meta, [{:deps, _, _} = fun, body]}, state ->
     [{{_, _, [:do]}, block_ast}] = body
     {:__block__, block_meta, [deps]} = block_ast
@@ -52,5 +52,5 @@ end
   quoted, state ->
     {quoted, state}
 end)
-|> Sourceror.to_string()
+|> VendoredSourceror.to_string()
 |> IO.puts()

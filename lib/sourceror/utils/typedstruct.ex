@@ -1,4 +1,4 @@
-defmodule Sourceror.Utils.TypedStruct do
+defmodule VendoredSourceror.Utils.TypedStruct do
   @moduledoc false
 
   defmacro typedstruct(do: ast) do

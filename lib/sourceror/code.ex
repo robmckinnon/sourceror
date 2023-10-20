@@ -1,9 +1,9 @@
 if Version.match?(System.version(), "< 1.13.0") do
-  defmodule Sourceror.Code do
+  defmodule VendoredSourceror.Code do
     @moduledoc false
 
-    alias Sourceror.Code.Formatter
-    alias Sourceror.Code.Normalizer
+    alias VendoredSourceror.Code.Formatter
+    alias VendoredSourceror.Code.Normalizer
 
     @spec string_to_quoted_with_comments(List.Chars.t(), keyword) ::
             {:ok, Macro.t(), list(map())} | {:error, {location :: keyword, term, term}}

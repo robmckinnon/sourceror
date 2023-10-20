@@ -1,13 +1,13 @@
-defmodule SourcerorTest.RangeTest do
+defmodule VendoredSourcerorTest.RangeTest do
   use ExUnit.Case, async: true
-  doctest Sourceror.Range
+  doctest VendoredSourceror.Range
 
-  alias SourcerorTest.Support.Corpus
+  alias VendoredSourcerorTest.Support.Corpus
 
   defp to_range(string, opts \\ []) do
     string
-    |> Sourceror.parse_string!()
-    |> Sourceror.Range.get_range(opts)
+    |> VendoredSourceror.parse_string!()
+    |> VendoredSourceror.Range.get_range(opts)
   end
 
   describe "get_range/1" do
@@ -251,19 +251,19 @@ defmodule SourcerorTest.RangeTest do
     end
 
     test "2-tuples from keyword lists" do
-      {_, _, [[tuple]]} = Sourceror.parse_string!(~S/[foo: :bar]/)
+      {_, _, [[tuple]]} = VendoredSourceror.parse_string!(~S/[foo: :bar]/)
 
-      assert Sourceror.Range.get_range(tuple) == %{
+      assert VendoredSourceror.Range.get_range(tuple) == %{
                start: [line: 1, column: 2],
                end: [line: 1, column: 11]
              }
     end
 
     test "2-tuples from partial keyword lists" do
-      alias Sourceror.Zipper, as: Z
+      alias VendoredSourceror.Zipper, as: Z
 
       value =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         config :my_app, :some_key,
           a: b
         """)
@@ -272,13 +272,13 @@ defmodule SourcerorTest.RangeTest do
         |> Z.rightmost()
         |> Z.node()
 
-      assert Sourceror.Range.get_range(value) == %{
+      assert VendoredSourceror.Range.get_range(value) == %{
                start: [line: 2, column: 3],
                end: [line: 2, column: 7]
              }
 
       value =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         config :my_app, :some_key,
           a: b,
           c:
@@ -289,17 +289,17 @@ defmodule SourcerorTest.RangeTest do
         |> Z.rightmost()
         |> Z.node()
 
-      assert Sourceror.Range.get_range(value) == %{
+      assert VendoredSourceror.Range.get_range(value) == %{
                start: [line: 2, column: 3],
                end: [line: 4, column: 6]
              }
     end
 
     test "stabs" do
-      alias Sourceror.Zipper, as: Z
+      alias VendoredSourceror.Zipper, as: Z
 
       [{_, stabs}] =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         case do
           a -> b
           c, d -> e
@@ -309,28 +309,28 @@ defmodule SourcerorTest.RangeTest do
         |> Z.down()
         |> Z.node()
 
-      assert Sourceror.Range.get_range(stabs) == %{
+      assert VendoredSourceror.Range.get_range(stabs) == %{
                start: [line: 2, column: 3],
                end: [line: 3, column: 12]
              }
     end
 
     test "stab without args" do
-      {:fn, _, [stab]} = Sourceror.parse_string!(~S"fn -> :ok end")
+      {:fn, _, [stab]} = VendoredSourceror.parse_string!(~S"fn -> :ok end")
 
-      assert Sourceror.Range.get_range(stab) == %{
+      assert VendoredSourceror.Range.get_range(stab) == %{
                start: [line: 1, column: 4],
                end: [line: 1, column: 10]
              }
 
       {:fn, _, [stab]} =
-        Sourceror.parse_string!(~S"""
+        VendoredSourceror.parse_string!(~S"""
         fn ->
           :ok
         end
         """)
 
-      assert Sourceror.Range.get_range(stab) == %{
+      assert VendoredSourceror.Range.get_range(stab) == %{
                start: [line: 1, column: 4],
                end: [line: 2, column: 6]
              }
@@ -695,7 +695,7 @@ defmodule SourcerorTest.RangeTest do
       # and appears to be a limitation of the parser, which does not include
       # any metadata about the parens. That is, this currently holds:
       #
-      #     Sourceror.parse_string!("& &1") == Sourceror.parse_string!("&(&1)")
+      #     VendoredSourceror.parse_string!("& &1") == VendoredSourceror.parse_string!("&(&1)")
       #
       # assert to_range(~S"&(&1)") == %{
       #          start: [line: 1, column: 1],
@@ -704,9 +704,9 @@ defmodule SourcerorTest.RangeTest do
     end
 
     test "arguments in captures" do
-      {:&, _, [{:&, _, _} = arg]} = Sourceror.parse_string!(~S"& &1")
+      {:&, _, [{:&, _, _} = arg]} = VendoredSourceror.parse_string!(~S"& &1")
 
-      assert Sourceror.Range.get_range(arg) == %{
+      assert VendoredSourceror.Range.get_range(arg) == %{
                start: [line: 1, column: 3],
                end: [line: 1, column: 5]
              }
@@ -718,9 +718,9 @@ defmodule SourcerorTest.RangeTest do
                end: [line: 1, column: 9]
              }
 
-      {{:., _, [Access, :get]} = access, _, _} = Sourceror.parse_string!(~S"foo[bar]")
+      {{:., _, [Access, :get]} = access, _, _} = VendoredSourceror.parse_string!(~S"foo[bar]")
 
-      assert Sourceror.Range.get_range(access) == %{
+      assert VendoredSourceror.Range.get_range(access) == %{
                start: [line: 1, column: 4],
                end: [line: 1, column: 9]
              }
@@ -730,7 +730,7 @@ defmodule SourcerorTest.RangeTest do
       ExUnit.CaptureIO.capture_io(:stderr, fn ->
         Corpus.walk!(fn quoted, path ->
           try do
-            Sourceror.get_range(quoted)
+            VendoredSourceror.get_range(quoted)
           rescue
             e ->
               flunk("""

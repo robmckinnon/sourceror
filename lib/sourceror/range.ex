@@ -1,13 +1,13 @@
-defmodule Sourceror.Range do
+defmodule VendoredSourceror.Range do
   @moduledoc false
 
-  import Sourceror.Identifier, only: [is_unary_op: 1, is_binary_op: 1]
+  import VendoredSourceror.Identifier, only: [is_unary_op: 1, is_binary_op: 1]
 
   defp split_on_newline(string) do
     String.split(string, ~r/\n|\r\n|\r/)
   end
 
-  @spec get_range(Macro.t()) :: Sourceror.range() | nil
+  @spec get_range(Macro.t()) :: VendoredSourceror.range() | nil
   def get_range(quoted, opts \\ []) do
     with %{} = range <- do_get_range(quoted) do
       if Keyword.get(opts, :include_comments, false) do
@@ -52,7 +52,7 @@ defmodule Sourceror.Range do
     }
   end
 
-  @spec do_get_range(Macro.t()) :: Sourceror.range() | nil
+  @spec do_get_range(Macro.t()) :: VendoredSourceror.range() | nil
   defp do_get_range(quoted)
 
   # Module aliases starting with a non-atom or special form
@@ -152,7 +152,7 @@ defmodule Sourceror.Range do
 
   # Block with no parenthesis
   defp do_get_range({:__block__, meta, args} = quoted) do
-    if Sourceror.has_closing_line?(quoted) do
+    if VendoredSourceror.has_closing_line?(quoted) do
       get_range_for_node_with_closing_line(quoted)
     else
       case args do
@@ -370,7 +370,7 @@ defmodule Sourceror.Range do
   defp do_get_range(_), do: nil
 
   defp get_range_for_unqualified_call({_call, meta, args} = quoted) do
-    if Sourceror.has_closing_line?(quoted) do
+    if VendoredSourceror.has_closing_line?(quoted) do
       get_range_for_node_with_closing_line(quoted)
     else
       with %{end: end_pos} <- get_range(List.last(args)) do
@@ -381,7 +381,7 @@ defmodule Sourceror.Range do
   end
 
   defp get_range_for_qualified_call_without_arguments({{:., _, call}, meta, []} = quoted) do
-    if Sourceror.has_closing_line?(quoted) do
+    if VendoredSourceror.has_closing_line?(quoted) do
       get_range_for_node_with_closing_line(quoted)
     else
       {left, right_len} =
@@ -411,7 +411,7 @@ defmodule Sourceror.Range do
   end
 
   defp get_range_for_qualified_call_with_arguments({{:., _, [left | _]}, _meta, args} = quoted) do
-    if Sourceror.has_closing_line?(quoted) do
+    if VendoredSourceror.has_closing_line?(quoted) do
       get_range_for_node_with_closing_line(quoted)
     else
       get_range_for_pair(left, List.last(args) || left)
@@ -419,8 +419,8 @@ defmodule Sourceror.Range do
   end
 
   defp get_range_for_node_with_closing_line({_, meta, _} = quoted) do
-    start_position = Sourceror.get_start_position(quoted)
-    end_position = Sourceror.get_end_position(quoted)
+    start_position = VendoredSourceror.get_start_position(quoted)
+    end_position = VendoredSourceror.get_end_position(quoted)
 
     end_position =
       if Keyword.has_key?(meta, :end) do

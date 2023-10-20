@@ -1,4 +1,4 @@
-defmodule Sourceror.Zipper.Inspect do
+defmodule VendoredSourceror.Zipper.Inspect do
   @moduledoc """
   Provides `Sourceror.Zipper`'s implementation for the `Inspect` protocol.
 
@@ -6,8 +6,8 @@ defmodule Sourceror.Zipper.Inspect do
   node and provides indicators of the surrounding context without displaying
   the full path, which can be very verbose for large ASTs.
 
-      iex> alias Sourceror.Zipper, as: Z
-      Sourceror.Zipper
+      iex> alias VendoredSourceror.Zipper, as: Z
+      VendoredSourceror.Zipper
 
       iex> code = \"""
       ...> def my_function do
@@ -71,7 +71,7 @@ defmodule Sourceror.Zipper.Inspect do
 
   import Inspect.Algebra
 
-  alias Sourceror.Zipper, as: Z
+  alias VendoredSourceror.Zipper, as: Z
 
   @typedoc """
   Inspection formats for zippers.
@@ -97,7 +97,7 @@ defmodule Sourceror.Zipper.Inspect do
 
   def inspect(zipper, :as_code, opts) do
     zipper.node
-    |> Sourceror.to_algebra(Map.to_list(opts))
+    |> VendoredSourceror.to_algebra(Map.to_list(opts))
     |> inspect_opaque_zipper(zipper, opts)
   end
 
@@ -169,7 +169,7 @@ defmodule Sourceror.Zipper.Inspect do
         {:def, [line: 1], [{:my_function, [line: 1], nil}, [do: :ok]]}
       >
 
-      iex> Sourceror.Zipper.Inspect.default_inspect_as(:as_code)
+      iex> VendoredSourceror.Zipper.Inspect.default_inspect_as(:as_code)
       :ok
       iex> zipper
       #Sourceror.Zipper<
@@ -179,7 +179,7 @@ defmodule Sourceror.Zipper.Inspect do
         end
       >
 
-      iex> Sourceror.Zipper.Inspect.default_inspect_as(:raw)
+      iex> VendoredSourceror.Zipper.Inspect.default_inspect_as(:raw)
       :ok
       iex> zipper
       %Sourceror.Zipper{
@@ -194,7 +194,7 @@ defmodule Sourceror.Zipper.Inspect do
   end
 end
 
-defimpl Inspect, for: Sourceror.Zipper do
-  alias Sourceror.Zipper, as: Z
+defimpl Inspect, for: VendoredSourceror.Zipper do
+  alias VendoredSourceror.Zipper, as: Z
   defdelegate inspect(zipper, opts), to: Z.Inspect
 end
